@@ -1,4 +1,4 @@
-# Lab 7 - Modules
+# Lab - Terraform Modules
 
 This is the starter lab structure for Lab 7.
 Your job is the complete the missing code in the following files:

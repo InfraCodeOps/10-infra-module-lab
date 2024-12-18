@@ -2,7 +2,7 @@
 # Complete three blocks below
 
 # Code to invoke the module for the scalable web app
-module "sacalable_web" {
+module "scalable_web" {
 # ...
 }
 

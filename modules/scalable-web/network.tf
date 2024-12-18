@@ -13,6 +13,11 @@ resource "aws_subnet" "app-subnets" {
   count      = var.num-replicas
   vpc_id     = aws_vpc.app-vpc.id
   cidr_block = "10.0.${count.index + 1}.0/24"
+  availability_zone_id = element(data.aws_availability_zones.available.zone_ids, count.index)
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
 # SG used with instances to allow inbound traffic
