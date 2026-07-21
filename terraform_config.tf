@@ -3,8 +3,8 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      # pinning to v5.x
-      version = "~> 5.0"
+      # pinning to v6.x
+      version = "~> 6.0"
     }
   }
 }

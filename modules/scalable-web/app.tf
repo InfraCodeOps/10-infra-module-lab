@@ -1,8 +1,8 @@
 
 # Fill in the data block below:
-# Code for looking up the latest Amazon Linux 2 AMI
+# Code for looking up the latest x86_64 Amazon Linux 2023 AMI
 # in the current region.
-data "aws_ami" "amazon-linux-2" {
+data "aws_ami" "amazon-linux-2023" {
 # ...
 }
 
@@ -11,7 +11,7 @@ data "aws_ami" "amazon-linux-2" {
 
 # The instances represent the web app servers
 resource "aws_instance" "webapp_instances" {
-  ami           = data.aws_ami.amazon-linux-2.id 
+  ami           = data.aws_ami.amazon-linux-2023.id
   instance_type = var.instance_type
   count         = var.num-replicas
   subnet_id     = element(aws_subnet.app-subnets.*.id, count.index)
@@ -30,6 +30,11 @@ resource "aws_instance" "webapp_instances" {
   # recognizes and provides metadata about the instance
   user_data = <<-EOF
     #!/bin/bash
+    TOKEN=$(curl -sS -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" http://169.254.169.254/latest/api/token)
+    INSTANCE_ID=$(curl -sS -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+    REGION=$(curl -sS -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
+    AVAILABILITY_ZONE=$(curl -sS -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone)
+
     cat <<END_OF_FILE > index.html
     <html>
     <head>
@@ -38,9 +43,9 @@ resource "aws_instance" "webapp_instances" {
     <body>
       <h1>Diagnostics for ${var.app-name}</h1>
       <h2>Hello World ${count.index}</h2>
-      <h3>Instance ID: $(curl -s http://169.254.169.254/latest/meta-data/instance-id)</h3>
-      <p>Region: $(curl -s http://169.254.169.254/latest/meta-data/placement/region)</p>
-      <p>Availability Zone: $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)</p>
+      <h3>Instance ID: $INSTANCE_ID</h3>
+      <p>Region: $REGION</p>
+      <p>Availability Zone: $AVAILABILITY_ZONE</p>
     </body>
     </html>
     END_OF_FILE

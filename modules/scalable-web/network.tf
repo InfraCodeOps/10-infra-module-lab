@@ -28,11 +28,10 @@ resource "aws_security_group" "instances" {
 
 # security group rule to allow ingress traffic on port 8080
 resource "aws_security_group_rule" "allow_http_inbound" {
-  type              = "ingress"
-  security_group_id = aws_security_group.instances.id
-  from_port = 8080
-  to_port   = 8080
-  protocol  = "tcp"
-  #allowing all ip addressess
-  cidr_blocks = ["0.0.0.0/0"]
+  type                     = "ingress"
+  security_group_id        = aws_security_group.instances.id
+  source_security_group_id = aws_security_group.alb.id
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
 }
